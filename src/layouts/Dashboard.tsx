@@ -1,7 +1,16 @@
 import { NavLink, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../store";
-import Icon from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
+import Icon, { BellOutlined } from "@ant-design/icons";
+import {
+  Badge,
+  Flex,
+  Layout,
+  Menu,
+  Space,
+  theme,
+  Dropdown,
+  Avatar,
+} from "antd";
 import { useState } from "react";
 import Logo from "../components/icons/Logo";
 import Home from "../components/icons/Home";
@@ -9,6 +18,8 @@ import UserIcon from "../components/icons/UserIcon";
 import { foodIcon } from "../components/icons/FoodIcon";
 import GiftIcon from "../components/icons/GiftIcon";
 import BasketIcon from "../components/icons/BasketIcon";
+import { useMutation } from "@tanstack/react-query";
+import { logout } from "../http/api";
 const { Sider, Header, Footer, Content } = Layout;
 
 const items = [
@@ -40,6 +51,15 @@ const items = [
 ];
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { logout: logoutFromStore } = useAuthStore();
+  const { mutate: logoutMutate } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logout,
+    onSuccess: async () => {
+      logoutFromStore();
+      return;
+    },
+  });
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -67,7 +87,40 @@ const Dashboard = () => {
           />
         </Sider>
         <Layout>
-          <Header style={{ padding: 0, background: colorBgContainer }} />
+          <Header
+            style={{
+              paddingLeft: "30px",
+              paddingRight: "30px",
+              background: colorBgContainer,
+            }}
+          >
+            <Flex gap="middle" align="start" justify="space-between">
+              <Badge text="Global" status={"success"} />
+              <Space size={16}>
+                <Badge dot={true}>
+                  <BellOutlined />
+                </Badge>
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: "logout",
+                        label: "Logout",
+                        onClick: () => logoutMutate(),
+                      },
+                    ],
+                  }}
+                  placement="bottomRight"
+                >
+                  <Avatar
+                    style={{ backgroundColor: "#fde3cf", color: "#f56a00" }}
+                  >
+                    U
+                  </Avatar>
+                </Dropdown>
+              </Space>
+            </Flex>
+          </Header>
           <Content style={{ margin: "0 16px" }}>
             <Outlet />
           </Content>
