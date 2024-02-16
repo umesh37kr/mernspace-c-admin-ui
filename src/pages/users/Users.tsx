@@ -1,11 +1,40 @@
 import { RightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Breadcrumb } from "antd";
+import { Breadcrumb, Space, Table } from "antd";
 import { Link } from "react-router-dom";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
 
 const Users = () => {
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "Name",
+      dataIndex: "firstName",
+      key: "firstName",
+      render: (_text: string, record: User) => {
+        return (
+          <div>
+            {record.firstName} {record.lastName}
+          </div>
+        );
+      },
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
+    },
+  ];
   const {
     data: users,
     isLoading,
@@ -19,22 +48,18 @@ const Users = () => {
   });
   return (
     <>
-      <Breadcrumb
-        separator={<RightOutlined />}
-        items={[{ title: <Link to={"/"}>Dashboard</Link> }, { title: "user" }]}
-      />
-      {isLoading && <div>Loading...</div>}
-      {isError && <div>{error.message}</div>};
-      {users && (
-        <div>
-          <h1>Users</h1>
-          <ul>
-            {users.map((user: User) => (
-              <li key={user.id}>{user.firstName}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
+        <Breadcrumb
+          separator={<RightOutlined />}
+          items={[
+            { title: <Link to={"/"}>Dashboard</Link> },
+            { title: "user" },
+          ]}
+        />
+        {isLoading && <div>Loading...</div>}
+        {isError && <div>{error.message}</div>}
+        <Table columns={columns} dataSource={users} />
+      </Space>
     </>
   );
 };
