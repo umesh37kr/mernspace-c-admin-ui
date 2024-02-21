@@ -1,13 +1,15 @@
-import { RightOutlined } from "@ant-design/icons";
+import { PlusOutlined, RightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Breadcrumb, Space, Table } from "antd";
+import { Breadcrumb, Button, Drawer, Space, Table } from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
 import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
+import { useState } from "react";
 
 const Users = () => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const columns = [
     {
       title: "ID",
@@ -68,8 +70,40 @@ const Users = () => {
           onFilterChange={(filterName: string, filterValue: string) => {
             console.log(filterName, filterValue);
           }}
-        />
+        >
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setDrawerOpen(true)}
+          >
+            Add User
+          </Button>
+        </UsersFilter>
         <Table columns={columns} dataSource={users} rowKey={"id"} />
+
+        <Drawer
+          title="Create User"
+          width={720}
+          destroyOnClose={true}
+          open={drawerOpen}
+          onClose={() => {
+            setDrawerOpen(false);
+          }}
+          extra={
+            <Space>
+              <Button>Cancel</Button>
+              <Button type="primary">Submit</Button>
+            </Space>
+          }
+        >
+          <p>this is paragraph</p>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque
+            molestiae, quibusdam ullam aliquid unde aut? Sunt dolorem, accusamus
+            quaerat sit inventore eos unde nihil harum optio aperiam ab,
+            recusandae saepe?
+          </p>
+        </Drawer>
       </Space>
     </>
   );
