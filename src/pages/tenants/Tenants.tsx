@@ -1,11 +1,50 @@
 import { RightOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Drawer, Space } from "antd";
-import { Link } from "react-router-dom";
+import { Breadcrumb, Button, Drawer, Space, Table } from "antd";
+import { Link, Navigate } from "react-router-dom";
 import TenantsFilter from "./TenantsFilter";
 import { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
+import { getTenants } from "../../http/api";
+import { useAuthStore } from "../../store";
 const Tenants = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Address",
+      dataIndex: "address",
+      key: "address",
+    },
+  ];
+
+  const {
+    data: tenants,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["tnants"],
+    queryFn: () => {
+      return getTenants().then((res) => res.data);
+    },
+  });
+
+  const { user } = useAuthStore();
+
+  if (user?.role !== "admin") {
+    return <Navigate to="/" replace={true} />;
+  }
+
   return (
     <>
       <Breadcrumb
@@ -24,7 +63,9 @@ const Tenants = () => {
           <PlusOutlined /> Add Restaurants
         </Button>
       </TenantsFilter>
-
+      {isLoading && <div>Loading...</div>}
+      {isError && <div>{error.message}</div>}
+      <Table dataSource={tenants} columns={columns} rowKey={"id"} />;
       <Drawer
         title="Add Restaurants"
         width={720}
