@@ -1,12 +1,13 @@
 import { PlusOutlined, RightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Breadcrumb, Button, Drawer, Space, Table } from "antd";
+import { Breadcrumb, Button, Drawer, Form, Space, Table, theme } from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { getUsers } from "../../http/api";
 import { User } from "../../types";
 import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
 import { useState } from "react";
+import UserForms from "./forms/UserForms";
 
 const Users = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -54,6 +55,9 @@ const Users = () => {
   if (user?.role !== "admin") {
     return <Navigate to="/" replace={true} />;
   }
+  const {
+    token: { colorBgLayout },
+  } = theme.useToken();
   return (
     <>
       <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
@@ -84,6 +88,7 @@ const Users = () => {
         <Drawer
           title="Create User"
           width={720}
+          styles={{ body: { backgroundColor: colorBgLayout } }}
           destroyOnClose={true}
           open={drawerOpen}
           onClose={() => {
@@ -96,13 +101,9 @@ const Users = () => {
             </Space>
           }
         >
-          <p>this is paragraph</p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque
-            molestiae, quibusdam ullam aliquid unde aut? Sunt dolorem, accusamus
-            quaerat sit inventore eos unde nihil harum optio aperiam ab,
-            recusandae saepe?
-          </p>
+          <Form layout="vertical">
+            <UserForms />
+          </Form>
         </Drawer>
       </Space>
     </>
