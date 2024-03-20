@@ -23,12 +23,13 @@ import {
 } from "antd";
 import { Link, Navigate } from "react-router-dom";
 import { createUser, getUsers } from "../../http/api";
-import { CreateUserData, User } from "../../types";
+import { CreateUserData, FieldData, User } from "../../types";
 import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
 import { useState } from "react";
 import UserForms from "./forms/UserForms";
 import { PER_PAGE } from "../../constants";
+// import { FieldData } from "rc-field-form/lib/interface";
 
 const Users = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -37,6 +38,7 @@ const Users = () => {
     perPage: PER_PAGE,
   });
   const [form] = Form.useForm();
+  const [filterForm] = Form.useForm();
   const queryClient = useQueryClient();
   const columns = [
     {
@@ -75,8 +77,11 @@ const Users = () => {
   } = useQuery({
     queryKey: ["users", queryParams],
     queryFn: () => {
+      const filteredParams = Object.fromEntries(
+        Object.entries(queryParams).filter((item) => !!item[1])
+      );
       const queyString = new URLSearchParams(
-        queryParams as unknown as Record<string, string>
+        filteredParams as unknown as Record<string, string>
       ).toString();
       console.log("queyString: ", queyString);
 
@@ -100,6 +105,14 @@ const Users = () => {
     await userMutate(form.getFieldsValue());
     setDrawerOpen(false);
     form.resetFields();
+  };
+  const onFilterChange = (changedFields: FieldData[]) => {
+    const changedFilterField = changedFields
+      .map((item) => ({
+        [item.name[0]]: item.value,
+      }))
+      .reduce((acc, item) => ({ ...acc, ...item }), {});
+    setQueryParams((prev) => ({ ...prev, ...changedFilterField }));
   };
   if (user?.role !== "admin") {
     return <Navigate to="/" replace={true} />;
@@ -127,19 +140,17 @@ const Users = () => {
             <Typography.Text type="danger">{error.message}</Typography.Text>
           )}
         </Flex>
-        <UsersFilter
-          onFilterChange={(filterName: string, filterValue: string) => {
-            console.log(filterName, filterValue);
-          }}
-        >
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setDrawerOpen(true)}
-          >
-            Add User
-          </Button>
-        </UsersFilter>
+        <Form form={filterForm} onFieldsChange={onFilterChange}>
+          <UsersFilter>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setDrawerOpen(true)}
+            >
+              Add User
+            </Button>
+          </UsersFilter>
+        </Form>
         <Table
           columns={columns}
           dataSource={users?.data}
