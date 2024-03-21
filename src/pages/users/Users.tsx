@@ -26,9 +26,10 @@ import { createUser, getUsers } from "../../http/api";
 import { CreateUserData, FieldData, User } from "../../types";
 import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
-import { useState } from "react";
+import React, { useState } from "react";
 import UserForms from "./forms/UserForms";
 import { PER_PAGE } from "../../constants";
+import { debounce } from "lodash";
 // import { FieldData } from "rc-field-form/lib/interface";
 
 const Users = () => {
@@ -106,13 +107,22 @@ const Users = () => {
     setDrawerOpen(false);
     form.resetFields();
   };
+  const debouncedQUpdate = React.useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParams((prev) => ({ ...prev, q: value }));
+    }, 1000);
+  }, []);
   const onFilterChange = (changedFields: FieldData[]) => {
     const changedFilterField = changedFields
       .map((item) => ({
         [item.name[0]]: item.value,
       }))
       .reduce((acc, item) => ({ ...acc, ...item }), {});
-    setQueryParams((prev) => ({ ...prev, ...changedFilterField }));
+    if ("q" in changedFilterField) {
+      debouncedQUpdate(changedFilterField.q);
+    } else {
+      setQueryParams((prev) => ({ ...prev, ...changedFilterField }));
+    }
   };
   if (user?.role !== "admin") {
     return <Navigate to="/" replace={true} />;
