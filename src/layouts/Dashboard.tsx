@@ -37,11 +37,6 @@ const getMenuItems = (roles: string) => {
       label: <NavLink to="/">Home</NavLink>,
     },
     {
-      key: "/restaurants",
-      icon: <Icon component={foodIcon} />,
-      label: <NavLink to="/restaurants">Restaurants</NavLink>,
-    },
-    {
       key: "/products",
       icon: <Icon component={BasketIcon} />,
       label: <NavLink to="/products">Products</NavLink>,
@@ -55,6 +50,11 @@ const getMenuItems = (roles: string) => {
   if (roles === "admin") {
     const menus = [...baseItems];
     menus.splice(1, 0, ...adminItems);
+    menus.splice(2, 0, {
+      key: "/restaurants",
+      icon: <Icon component={foodIcon} />,
+      label: <NavLink to="/restaurants">Restaurants</NavLink>,
+    });
     return menus;
   }
   return baseItems;
