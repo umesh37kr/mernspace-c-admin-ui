@@ -189,6 +189,9 @@ const Users = () => {
                 };
               });
             },
+            showTotal: (total: number, range: number[]) => {
+              return `showing: ${range[0]} - ${range[1]} of ${total} items`;
+            },
           }}
         />
 
