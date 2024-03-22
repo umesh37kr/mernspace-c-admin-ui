@@ -33,13 +33,26 @@ import { debounce } from "lodash";
 // import { FieldData } from "rc-field-form/lib/interface";
 
 const Users = () => {
+  const [form] = Form.useForm();
+  const [filterForm] = Form.useForm();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [currentEditingUser, setcurrentEditingUser] = useState<User | null>(
+    null
+  );
+  React.useEffect(() => {
+    if (currentEditingUser) {
+      setDrawerOpen(true);
+      form.setFieldsValue({
+        ...currentEditingUser,
+        tenantId: currentEditingUser.tenant?.id,
+      });
+    }
+  }, [currentEditingUser, form]);
+
   const [queryParams, setQueryParams] = useState({
     currentPage: 1,
     perPage: PER_PAGE,
   });
-  const [form] = Form.useForm();
-  const [filterForm] = Form.useForm();
   const queryClient = useQueryClient();
   const columns = [
     {
@@ -174,7 +187,26 @@ const Users = () => {
           </UsersFilter>
         </Form>
         <Table
-          columns={columns}
+          columns={[
+            ...columns,
+            {
+              title: "Actions",
+              render: (_: string, record: User) => {
+                return (
+                  <Space>
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        setcurrentEditingUser(record);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  </Space>
+                );
+              },
+            },
+          ]}
           dataSource={users?.data}
           rowKey={"id"}
           pagination={{

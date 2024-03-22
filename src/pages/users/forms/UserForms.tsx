@@ -97,6 +97,7 @@ const UserForms = () => {
                     ]}
                   >
                     <Select
+                      id="selectBoxInUserForm"
                       size="large"
                       style={{ width: "100%" }}
                       allowClear={true}
