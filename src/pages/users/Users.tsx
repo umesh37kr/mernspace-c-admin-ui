@@ -22,7 +22,7 @@ import {
   theme,
 } from "antd";
 import { Link, Navigate } from "react-router-dom";
-import { createUser, getUsers } from "../../http/api";
+import { createUser, getUsers, updateUser } from "../../http/api";
 import { CreateUserData, FieldData, User } from "../../types";
 import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
@@ -105,7 +105,6 @@ const Users = () => {
       const queyString = new URLSearchParams(
         filteredParams as unknown as Record<string, string>
       ).toString();
-      console.log("queyString: ", queyString);
 
       return getUsers(queyString).then((res) => res.data);
     },
@@ -121,11 +120,28 @@ const Users = () => {
       return;
     },
   });
+
+  const { mutate: UpdateUserMutation } = useMutation({
+    mutationKey: ["update-user"],
+    mutationFn: async (data: CreateUserData) =>
+      updateUser(data, currentEditingUser!.id).then((res) => res.data),
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      return;
+    },
+  });
+
   const { user } = useAuthStore();
   const onHandleSubmit = async () => {
     await form.validateFields();
-    await userMutate(form.getFieldsValue());
+    const isEditMode = !!currentEditingUser;
+    if (isEditMode) {
+      await UpdateUserMutation(form.getFieldsValue());
+    } else {
+      await userMutate(form.getFieldsValue());
+    }
     setDrawerOpen(false);
+    setcurrentEditingUser(null);
     form.resetFields();
   };
   const debouncedQUpdate = React.useMemo(() => {
