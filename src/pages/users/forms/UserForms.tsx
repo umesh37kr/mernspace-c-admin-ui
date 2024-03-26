@@ -3,7 +3,7 @@ import { Card, Col, Form, Input, Row, Select, Space } from "antd";
 import { getTenants } from "../../../http/api";
 import { Tenant } from "../../../types";
 
-const UserForms = () => {
+const UserForms = ({ isEditMode = false }: { isEditMode: boolean }) => {
   const { data: tenants } = useQuery({
     queryKey: ["tenants"],
     queryFn: () => {
@@ -65,24 +65,27 @@ const UserForms = () => {
                 </Col>
               </Row>
             </Card>
-            <Card title="Security info">
-              <Row gutter={20}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Password"
-                    name={"password"}
-                    rules={[
-                      {
-                        required: true,
-                        message: "password is required",
-                      },
-                    ]}
-                  >
-                    <Input type="password" size="large" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Card>
+            {!isEditMode && (
+              <Card title="Security info">
+                <Row gutter={20}>
+                  <Col span={12}>
+                    <Form.Item
+                      label="Password"
+                      name={"password"}
+                      rules={[
+                        {
+                          required: true,
+                          message: "password is required",
+                        },
+                      ]}
+                    >
+                      <Input type="password" size="large" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Card>
+            )}
+
             <Card title="Role">
               <Row gutter={20}>
                 <Col span={12}>

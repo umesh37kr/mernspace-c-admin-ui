@@ -228,13 +228,14 @@ const Users = () => {
         />
 
         <Drawer
-          title="Create User"
+          title={currentEditingUser ? "Edit User" : "Create User"}
           width={720}
           styles={{ body: { backgroundColor: colorBgLayout } }}
           destroyOnClose={true}
           open={drawerOpen}
           onClose={() => {
             setDrawerOpen(false);
+            setcurrentEditingUser(null);
             form.resetFields();
           }}
           extra={
@@ -254,7 +255,7 @@ const Users = () => {
           }
         >
           <Form layout="vertical" form={form}>
-            <UserForms />
+            <UserForms isEditMode={!!currentEditingUser} />
           </Form>
         </Drawer>
       </Space>
