@@ -20,3 +20,5 @@ export const updateUser = (user: CreateUserData, id: string) =>
 
 // catalog service
 export const getCategories = () => api.get(`${CATALOG_SERVICE}/categories/all`);
+export const getProducts = (queryParam: string) =>
+  api.get(`${CATALOG_SERVICE}/products?${queryParam}`);
