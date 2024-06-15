@@ -1,4 +1,8 @@
-import { PlusOutlined, RightOutlined } from "@ant-design/icons";
+import {
+  LoadingOutlined,
+  PlusOutlined,
+  RightOutlined,
+} from "@ant-design/icons";
 import {
   Breadcrumb,
   Button,
@@ -6,18 +10,20 @@ import {
   Form,
   Image,
   Space,
+  Spin,
   Table,
   Tag,
   Typography,
 } from "antd";
 import { Link } from "react-router-dom";
 import ProductsFilter from "./ProductsFilter";
-import { Product } from "../../types";
-import { useState } from "react";
+import { FieldData, Product } from "../../types";
+import React, { useState } from "react";
 import { PER_PAGE } from "../../constants";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getProducts } from "../../http/api";
 import { format } from "date-fns";
+import { debounce } from "lodash";
 
 const columns = [
   {
@@ -79,9 +85,9 @@ const Products = () => {
 
   const {
     data: products,
-    // isFetching,
-    // isError,
-    // error,
+    isFetching,
+    isError,
+    error,
   } = useQuery({
     queryKey: ["products", queryParams],
     queryFn: () => {
@@ -96,7 +102,30 @@ const Products = () => {
     },
     placeholderData: keepPreviousData,
   });
-  console.log("products::", products);
+
+  const debouncedQUpdate = React.useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParams((prev) => ({ ...prev, q: value, currentPage: 1 }));
+    }, 500);
+  }, []);
+
+  const onFilterChange = (changedFields: FieldData[]) => {
+    console.log("changedFields::", changedFields);
+    const changedFilterField = changedFields
+      .map((item) => ({
+        [item.name[0]]: item.value,
+      }))
+      .reduce((acc, item) => ({ ...acc, ...item }), {});
+    if ("q" in changedFilterField) {
+      debouncedQUpdate(changedFilterField.q);
+    } else {
+      setQueryParams((prev) => ({
+        ...prev,
+        ...changedFilterField,
+        currentPage: 1,
+      }));
+    }
+  };
   return (
     <>
       <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
@@ -108,8 +137,16 @@ const Products = () => {
               { title: "products" },
             ]}
           />
+          {isFetching && (
+            <Spin
+              indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
+            />
+          )}
+          {isError && (
+            <Typography.Text type="danger">{error.message}</Typography.Text>
+          )}
         </Flex>
-        <Form form={filterForm} onFieldsChange={() => {}}>
+        <Form form={filterForm} onFieldsChange={onFilterChange}>
           <ProductsFilter>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => {}}>
               Add Product
