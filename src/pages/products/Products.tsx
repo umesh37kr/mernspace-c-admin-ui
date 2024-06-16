@@ -6,6 +6,7 @@ import {
 import {
   Breadcrumb,
   Button,
+  Drawer,
   Flex,
   Form,
   Image,
@@ -14,6 +15,7 @@ import {
   Table,
   Tag,
   Typography,
+  theme,
 } from "antd";
 import { Link } from "react-router-dom";
 import ProductsFilter from "./ProductsFilter";
@@ -25,6 +27,7 @@ import { getProducts } from "../../http/api";
 import { format } from "date-fns";
 import { debounce } from "lodash";
 import { useAuthStore } from "../../store";
+import ProductForm from "./forms/ProductForm";
 
 const columns = [
   {
@@ -80,6 +83,8 @@ const columns = [
 const Products = () => {
   const { user } = useAuthStore();
   const [filterForm] = Form.useForm();
+  const [form] = Form.useForm();
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [queryParams, setQueryParams] = useState({
     currentPage: 1,
     perPage: PER_PAGE,
@@ -129,6 +134,12 @@ const Products = () => {
       }));
     }
   };
+  const onHandleSubmit = () => {
+    console.log("submitting..");
+  };
+  const {
+    token: { colorBgLayout },
+  } = theme.useToken();
   return (
     <>
       <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
@@ -151,7 +162,11 @@ const Products = () => {
         </Flex>
         <Form form={filterForm} onFieldsChange={onFilterChange}>
           <ProductsFilter>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => {}}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setDrawerOpen(true)}
+            >
               Add Product
             </Button>
           </ProductsFilter>
@@ -191,6 +206,36 @@ const Products = () => {
             },
           }}
         />
+        <Drawer
+          title={"Add Product"}
+          width={720}
+          styles={{ body: { backgroundColor: colorBgLayout } }}
+          destroyOnClose={true}
+          open={drawerOpen}
+          onClose={() => {
+            setDrawerOpen(false);
+            form.resetFields();
+          }}
+          extra={
+            <Space>
+              <Button
+                onClick={() => {
+                  setDrawerOpen(false);
+                  form.resetFields();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="primary" onClick={onHandleSubmit}>
+                Submit
+              </Button>
+            </Space>
+          }
+        >
+          <Form layout="vertical" form={form}>
+            <ProductForm />
+          </Form>
+        </Drawer>
       </Space>
     </>
   );
