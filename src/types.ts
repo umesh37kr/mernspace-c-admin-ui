@@ -13,13 +13,12 @@ export type User = {
 };
 
 export type CreateUserData = {
-  id: string;
   email: string;
   firstName: string;
   lastName: string;
   password: string;
-  tenantId: number;
   role: string;
+  tenantId: number;
 };
 
 export type Tenant = {
@@ -33,9 +32,14 @@ export type FieldData = {
   value?: string;
 };
 
+export type CreateTenantData = {
+  name: string;
+  address: string;
+};
+
 export interface PriceConfiguration {
   [key: string]: {
-    priceType: "base" | "additional";
+    priceType: "base" | "aditional";
     availableOptions: string[];
   };
 }
@@ -51,15 +55,25 @@ export interface Category {
   _id: string;
   name: string;
   priceConfiguration: PriceConfiguration;
-  attribute: Attribute[];
+  attributes: Attribute[];
 }
+
+export type ProductAttribute = {
+  name: string;
+  value: string | boolean;
+};
 
 export type Product = {
   _id: string;
   name: string;
   image: string;
-  category: Category;
   description: string;
+  category: Category;
+  priceConfiguration: PriceConfiguration;
+  attributes: ProductAttribute[];
   isPublish: boolean;
   createdAt: string;
 };
+
+export type ImageField = { file: File };
+export type CreateProductData = Product & { image: ImageField };

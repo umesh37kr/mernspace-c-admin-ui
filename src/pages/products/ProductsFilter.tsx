@@ -23,7 +23,7 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: () => {
-      return getTenants(`perPage=100&currentPage=1`).then((res) => res.data);
+      return getTenants(`perPage=100&currentPage=1`);
     },
   });
 
@@ -36,12 +36,12 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
 
   return (
     <Card>
-      <Row justify={"space-between"}>
+      <Row justify="space-between">
         <Col span={16}>
           <Row gutter={20}>
-            <Col>
+            <Col span={6}>
               <Form.Item name="q">
-                <Input.Search allowClear={true} placeholder="search" />
+                <Input.Search allowClear={true} placeholder="Search" />
               </Form.Item>
             </Col>
 
@@ -62,16 +62,15 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                 </Select>
               </Form.Item>
             </Col>
-
             {user!.role === "admin" && (
               <Col span={6}>
                 <Form.Item name="tenantId">
                   <Select
                     style={{ width: "100%" }}
                     allowClear={true}
-                    placeholder="Select restaurants"
+                    placeholder="Select restaurant"
                   >
-                    {restaurants?.map((restaurant: Tenant) => {
+                    {restaurants?.data.data.map((restaurant: Tenant) => {
                       return (
                         <Select.Option
                           key={restaurant.id}
@@ -85,10 +84,11 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                 </Form.Item>
               </Col>
             )}
-            <Col span={8}>
+
+            <Col span={6}>
               <Space>
                 <Form.Item name="isPublish">
-                  <Switch defaultChecked onChange={() => {}} />
+                  <Switch defaultChecked={false} onChange={() => {}} />
                 </Form.Item>
                 <Typography.Text style={{ marginBottom: 22, display: "block" }}>
                   Show only published
