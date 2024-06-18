@@ -33,7 +33,7 @@ const ProductForm = ({ form }: { form: FormInstance }) => {
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: () => {
-      return getTenants(`perPage=100&currentPage=1`);
+      return getTenants(`perPage=100&currentPage=1`).then((res) => res.data);
     },
   });
 
@@ -132,7 +132,7 @@ const ProductForm = ({ form }: { form: FormInstance }) => {
                       onChange={() => {}}
                       placeholder="Select restaurant"
                     >
-                      {restaurants?.data.data.map((tenant: Tenant) => (
+                      {restaurants?.map((tenant: Tenant) => (
                         <Select.Option
                           value={String(tenant.id)}
                           key={tenant.id}

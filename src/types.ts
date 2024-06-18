@@ -55,7 +55,7 @@ export interface Category {
   _id: string;
   name: string;
   priceConfiguration: PriceConfiguration;
-  attributes: Attribute[];
+  attribute: Attribute[];
 }
 
 export type ProductAttribute = {

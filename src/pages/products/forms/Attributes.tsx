@@ -15,7 +15,7 @@ const Attributes = ({ selectedCategory }: PricingProps) => {
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
-
+  console.log("fetchedCategory:", fetchedCategory);
   if (!fetchedCategory) return null;
 
   return (
@@ -23,7 +23,7 @@ const Attributes = ({ selectedCategory }: PricingProps) => {
       title={<Typography.Text>Attributes</Typography.Text>}
       bordered={false}
     >
-      {fetchedCategory.attributes.map((attribute) => {
+      {fetchedCategory.attribute.map((attribute) => {
         return (
           <div key={attribute.name}>
             {attribute.widgetType === "radio" ? (

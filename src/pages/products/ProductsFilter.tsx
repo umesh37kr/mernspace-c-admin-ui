@@ -23,7 +23,7 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
   const { data: restaurants } = useQuery({
     queryKey: ["restaurants"],
     queryFn: () => {
-      return getTenants(`perPage=100&currentPage=1`);
+      return getTenants(`perPage=100&currentPage=1`).then((res) => res.data);
     },
   });
 
@@ -70,7 +70,7 @@ const ProductsFilter = ({ children }: ProductsFilterProps) => {
                     allowClear={true}
                     placeholder="Select restaurant"
                   >
-                    {restaurants?.data.data.map((restaurant: Tenant) => {
+                    {restaurants?.map((restaurant: Tenant) => {
                       return (
                         <Select.Option
                           key={restaurant.id}
